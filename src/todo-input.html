@@ -1,0 +1,98 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="todo-input">
+    <template strip-whitespace>
+        <style>
+         :host {
+            display: block;
+        }
+
+        input::-webkit-input-placeholder {
+          font-style: italic;
+          font-weight: 300;
+          color: #e6e6e6;
+        }
+        input::-moz-placeholder {
+          font-style: italic;
+          font-weight: 300;
+          color: #e6e6e6;
+        }
+        input::input-placeholder {
+          font-style: italic;
+          font-weight: 300;
+          color: #e6e6e6;
+        }
+
+        .new-todo {
+          position: relative;
+          margin: 0;
+          width: 100%;
+          font-size: 24px;
+          font-family: inherit;
+          font-weight: inherit;
+          line-height: 1.4em;
+          border: 0;
+          color: inherit;
+          padding: 6px;
+          border: 1px solid #999;
+          box-shadow: inset 0 -1px 5px 0 rgba(0, 0, 0, 0.2);
+          box-sizing: border-box;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+
+          @apply --minx-todo-input-styles;
+        }
+        </style>
+
+        <input autofocus type="text" class="new-todo" id="input"
+          placeholder="What needs to be done?"
+          value="{{text::input}}"
+          on-keydown="_onKeydownAction"
+          on-blur="_onBlurAction">
+    </template>
+    <script>
+    const ENTER_KEY = 13;
+    const ESC_KEY = 27;
+
+    class TodoInput extends Polymer.Element {
+      static get is() {
+        return 'todo-input';
+      }
+      static get properties() {
+        return {
+          text: {
+            type: String,
+            value: ''
+          }
+        };
+      }
+      focus() {
+        this.$.input.focus();
+      }
+      _onKeydownAction(event) {
+        if (event.keyCode === ENTER_KEY) {
+          this.dispatchEvent(new CustomEvent('todo-input-commit', {
+            detail: this.text,
+            bubbles: true,
+            composed: true
+          }));
+          this.text = '';
+        } else if (event.keyCode === ESC_KEY) {
+          this.dispatchEvent(new CustomEvent('todo-input-cancel', {
+            bubbles: true,
+            composed: true
+          }));
+          this.text = '';
+        }
+      }
+      _onBlurAction(event) {
+        this.dispatchEvent(new CustomEvent('todo-input-blur', {
+          bubbles: true,
+          composed: true
+        }));
+      }
+    }
+
+    customElements.define(TodoInput.is, TodoInput);
+    </script>
+</dom-module>

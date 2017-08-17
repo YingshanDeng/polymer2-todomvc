@@ -1,0 +1,251 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="../bower_components/app-route/app-location.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+
+<link rel="import" href="todo-model.html">
+<link rel="import" href="todo-input.html">
+<link rel="import" href="todo-item.html">
+
+<dom-module id="polymer2-todomvc-app">
+  <template strip-whitespace>
+    <style>
+      :host {
+        display: block;
+      }
+
+      #header {
+        position: relative;
+      }
+      #header .wrapper {
+        position: absolute;
+        width: 60px;
+        height: 65px;
+        z-index: 2;
+      }
+      #header todo-input {
+        --minx-todo-input-styles: {
+          padding: 16px 16px 16px 60px;
+          outline: none;
+          border: none;
+          background: rgba(0, 0, 0, 0.003);
+          box-shadow: inset 0 -2px 1px rgba(0,0,0,0.03);
+        };
+      }
+
+      #toggle-all {
+        position: absolute;
+        display: none;
+      }
+      #toggle-all + label {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 60px;
+        height: 65px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      #toggle-all + label:before {
+        content: '❯';
+        font-size: 22px;
+        color: #e6e6e6;
+        -webkit-transform: rotate(90deg);
+        transform: rotate(90deg);
+      }
+      #toggle-all:checked + label:before {
+        color: #737373;
+      }
+
+      #footer {
+        color: #777;
+        padding: 10px 15px;
+        height: 20px;
+        text-align: center;
+        border-top: 1px solid #e6e6e6;
+      }
+      #footer:before {
+        content: '';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        height: 50px;
+        overflow: hidden;
+        box-shadow: 0 1px 1px rgba(0, 0, 0, 0.2),
+                    0 8px 0 -3px #f6f6f6,
+                    0 9px 1px -3px rgba(0, 0, 0, 0.2),
+                    0 16px 0 -6px #f6f6f6,
+                    0 17px 2px -6px rgba(0, 0, 0, 0.2);
+      }
+      .todo-count {
+        float: left;
+        text-align: left;
+      }
+      .filters {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        position: absolute;
+        right: 0;
+        left: 0;
+      }
+      .filters a {
+        color: inherit;
+        margin: 3px;
+        padding: 3px 7px;
+        text-decoration: none;
+        border: 1px solid transparent;
+        border-radius: 3px;
+      }
+      .filters a:hover {
+        border-color: rgba(175, 47, 47, 0.1);
+      }
+      .filters a.iron-selected {
+        border-color: rgba(175, 47, 47, 0.2);
+      }
+
+      .clear-completed {
+        margin: 0;
+        padding: 0;
+        border: 0;
+        outline: 0;
+        background: none;
+        font-size: 100%;
+        vertical-align: baseline;
+        font-family: inherit;
+        font-weight: inherit;
+        color: inherit;
+        -webkit-appearance: none;
+        appearance: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        float: right;
+        position: relative;
+        line-height: 20px;
+        text-decoration: none;
+        cursor: pointer;
+      }
+      .clear-completed:hover {
+        text-decoration: underline;
+      }
+    </style>
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/:page" data="{{data}}" tail="{{tail}}"></app-route>
+
+    <todo-model id="model" items="{{items}}"></todo-model>
+
+    <section>
+      <header id="header">
+        <div class="wrapper">
+          <input id="toggle-all" type="checkbox" checked="[[allCompleted]]" on-change="_toggleAllComplete">
+          <label for="toggle-all"></label>
+        </div>
+        <todo-input></todo-input>
+      </header>
+
+      <template is="dom-if" if="{{items.length}}">
+        <section>
+          <template
+            is="dom-repeat"
+            items="{{items}}"
+            observe="completed"
+            filter="{{_matchesFilter(route.path)}}"
+            initial-count="10"
+            strip-whitespace>
+            <todo-item item="{{item}}" index="[[index]]"></todo-item>
+          </template>
+        </section>
+      </template>
+
+      <footer id="footer">
+        <span class="todo-count">[[activeItems]]</span>
+
+        <iron-selector class="filters" selected$="{{route.path}}" attr-for-selected="route">
+          <a route="/" href="/">All</a>
+          <a route="/active" href="/active">Active</a>
+          <a route="/completed" href="/completed">Complete</a>
+        </iron-selector>
+
+        <template is="dom-if" if="[[hasCompleted]]">
+          <button class="clear-completed" on-tap="_onClearCompletedAction">Clear completed</button>
+        </template>
+      </footer>
+    </section>
+  </template>
+
+  <script>
+    /**
+     * @customElement
+     * @polymer
+     */
+    class Polymer2TodomvcApp extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() { return 'polymer2-todomvc-app'; }
+      static get properties() {
+        return {
+          items: {
+            type: Array,
+            value: () => []
+          },
+          allCompleted: {
+            type: Boolean,
+            value: false
+          },
+          hasCompleted: {
+            type: Boolean,
+            value: false
+          },
+          activeItems: {
+            type: String,
+            value: "0 item left"
+          }
+        };
+      }
+      static get observers() {
+        return [
+          '_observeItemsChange(items.*)'
+        ];
+      }
+      _observeItemsChange(changeRecord) {
+        if (changeRecord) {
+          let _total = this.items.length;
+          let _completes = this.$.model.getCompletedCount();
+          let _actives = _total - _completes;
+          this.set('hasCompleted', !!_completes)
+          this.set('allCompleted', _total === _completes);
+          this.set('activeItems', `${_actives} ${_actives > 1 ? 'items' : 'item'} left`);
+          this.$.model.saveTodoItems();
+        }
+      }
+      ready() {
+        super.ready();
+        this.addEventListener('todo-input-commit', (event) => {
+          this.$.model.newItem(event.detail);
+        });
+        this.addEventListener('todo-destroy-item', (event) => {
+          this.$.model.destroyItem(event.detail);
+        });
+      }
+      _matchesFilter(path) {
+        return function (item) {
+          if (path === '/active') {
+            return !item.completed;
+          } else if (path === '/completed') {
+            return item.completed;
+          } else {
+            return true;
+          }
+        }
+      }
+      _toggleAllComplete(event) {
+        this.$.model.setAllItemsCompleted(event.target.checked);
+      }
+      _onClearCompletedAction(event) {
+        this.$.model.clearCompletedItems();
+      }
+    }
+
+    window.customElements.define(Polymer2TodomvcApp.is, Polymer2TodomvcApp);
+  </script>
+</dom-module>

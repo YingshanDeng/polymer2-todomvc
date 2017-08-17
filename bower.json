@@ -3,7 +3,9 @@
   "description": "Polymer2 TodoMVC Example",
   "main": "index.html",
   "dependencies": {
-    "polymer": "Polymer/polymer#^2.0.0"
+    "polymer": "Polymer/polymer#^2.0.0",
+    "app-route": "polymerelements/app-route#^2.0.0",
+    "iron-selector": "^2.0.0"
   },
   "devDependencies": {
     "web-component-tester": "Polymer/web-component-tester#^6.0.0",

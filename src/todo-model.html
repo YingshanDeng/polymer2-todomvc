@@ -1,0 +1,96 @@
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+
+<dom-module id="todo-model">
+    <template>
+      <style>
+        :host {
+          display: none;
+        }
+      </style>
+    </template>
+    <script>
+    class TodoModel extends Polymer.Element {
+      static get is() {
+        return 'todo-model';
+      }
+      static get properties() {
+        return {
+          items: {
+            type: Array,
+            notify: true,
+            value: () => []
+          },
+          name: {
+            type: String,
+            readOnly: true,
+            value: 'polymer2-todo'
+          }
+        };
+      }
+      ready() {
+        super.ready();
+
+        let _items = this._getTodoItemsFromLocalStorage();
+        if (_items) {
+          this.set('items', _items);
+        }
+      }
+
+      newItem(title) {
+        title = String(title).trim();
+        if (!title && !title.length) {
+          return;
+        }
+
+        this.unshift('items', {
+          title: title,
+          completed: false
+        });
+        this.saveTodoItems();
+      }
+      destroyItem(index) {
+        this.splice('items', index, 1);
+        this.saveTodoItems();
+      }
+      setAllItemsCompleted(completed) {
+        this.items.forEach((item, index) => {
+          this.set(`items.${index}.completed`, completed);
+        });
+        this.notifySplices('items');
+        this.saveTodoItems();
+      }
+      getCompletedCount() {
+        return this.items.filter(item => item.completed).length;
+      }
+      clearCompletedItems() {
+        this.set('items', this.items.filter(item => !item.completed));
+        this.saveTodoItems();
+      }
+
+      saveTodoItems() {
+        this._handler && clearTimeout(this._handler);
+        this._handler = setTimeout(() => {
+          try {
+            if (!this.items || !this.items.length) {
+              window.localStorage.removeItem(this.name);
+            } else {
+              window.localStorage.setItem(this.name, JSON.stringify(this.items));
+            }
+          } catch(e) {
+            console.error('Could not save to localStorage.', e);
+          }
+        }, 300);
+      }
+
+      _getTodoItemsFromLocalStorage() {
+        try {
+          let v = window.localStorage.getItem(this.name);
+          return JSON.parse(v);
+        } catch(e) {
+          console.error('Could not parse local storage value.', e);
+        }
+      }
+    }
+    customElements.define(TodoModel.is, TodoModel);
+    </script>
+</dom-module>
