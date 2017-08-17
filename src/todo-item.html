@@ -95,14 +95,14 @@
           }
         </style>
 
-        <template is="dom-if" if="[[!editing]]" strip-whitespace>
+        <template is="dom-if" if="[[!editing]]">
           <div>
             <input type="checkbox" class="toggle" checked="{{item.completed::change}}">
             <label on-dblclick="_onEditAction">[[item.title]]</label>
             <button class="destroy" on-tap="_onDestroyAction"></button>
           </div>
         </template>
-        <template is="dom-if" if="[[editing]]" strip-whitespace>
+        <template is="dom-if" if="[[editing]]">
           <todo-input
             class="edit"
             on-todo-input-commit="_onCommitAction"

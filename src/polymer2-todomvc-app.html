@@ -138,10 +138,12 @@
 
     <section>
       <header id="header">
-        <div class="wrapper">
-          <input id="toggle-all" type="checkbox" checked="[[allCompleted]]" on-change="_toggleAllComplete">
-          <label for="toggle-all"></label>
-        </div>
+        <template is="dom-if"  if="{{items.length}}">
+          <div class="wrapper">
+            <input id="toggle-all" type="checkbox" checked="[[allCompleted]]" on-change="_toggleAllComplete">
+            <label for="toggle-all"></label>
+          </div>
+        </template>
         <todo-input></todo-input>
       </header>
 
@@ -152,8 +154,7 @@
             items="{{items}}"
             observe="completed"
             filter="{{_matchesFilter(route.path)}}"
-            initial-count="10"
-            strip-whitespace>
+            initial-count="10">
             <todo-item item="{{item}}" index="[[index]]"></todo-item>
           </template>
         </section>
