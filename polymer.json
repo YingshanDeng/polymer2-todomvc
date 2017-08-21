@@ -1,4 +1,14 @@
 {
+  "entrypoint": "index.html",
+  "shell": "src/polymer2-todomvc-app.html",
+  "extraDependencies": [
+    "manifest.json",
+    "bower_components/webcomponentsjs/*.js"
+  ],
+  "builds": [
+    { "preset": "es5-bundled" },
+    { "preset": "es6-unbundled" }
+  ],
   "lint": {
     "rules": [
       "polymer-2"
