@@ -1,0 +1,23 @@
+{
+  "name": "polymer2-todomvc",
+  "version": "1.0.0",
+  "description": "Polymer2 TodoMVC Example",
+  "main": "index.html",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "site": "polymer build && rm -rf docs && cp -a build/es5-bundled docs/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YingshanDeng/polymer2-todomvc.git"
+  },
+  "author": "YingshanDeng<yingshandeng@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/YingshanDeng/polymer2-todomvc/issues"
+  },
+  "homepage": "https://github.com/YingshanDeng/polymer2-todomvc#readme"
+}

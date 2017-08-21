@@ -1,0 +1,7 @@
+{
+  "name": "polymer2-todomvc",
+  "short_name": "polymer2-todomvc",
+  "description": "Polymer2 TodoMVC Example",
+  "start_url": "/",
+  "display": "standalone"
+}
