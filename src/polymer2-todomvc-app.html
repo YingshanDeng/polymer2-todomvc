@@ -131,7 +131,7 @@
         text-decoration: underline;
       }
     </style>
-    <app-location route="{{route}}"></app-location>
+    <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:page"></app-route>
 
     <todo-model id="model" items="{{items}}"></todo-model>
@@ -158,21 +158,20 @@
             <todo-item item="{{item}}" index="[[index]]"></todo-item>
           </template>
         </section>
+
+        <footer id="footer">
+          <span class="todo-count">[[activeItems]]</span>
+          <iron-selector class="filters" selected$="{{route.path}}" attr-for-selected="route" fallback-selection="/">
+            <a route="/" href="#/">All</a>
+            <a route="/active" href="#/active">Active</a>
+            <a route="/completed" href="#/completed">Complete</a>
+          </iron-selector>
+
+          <template is="dom-if" if="[[hasCompleted]]">
+            <button class="clear-completed" on-tap="_onClearCompletedAction">Clear completed</button>
+          </template>
+        </footer>
       </template>
-
-      <footer id="footer">
-        <span class="todo-count">[[activeItems]]</span>
-
-        <iron-selector class="filters" selected$="{{route.path}}" attr-for-selected="route">
-          <a route="/" href="/">All</a>
-          <a route="/active" href="/active">Active</a>
-          <a route="/completed" href="/completed">Complete</a>
-        </iron-selector>
-
-        <template is="dom-if" if="[[hasCompleted]]">
-          <button class="clear-completed" on-tap="_onClearCompletedAction">Clear completed</button>
-        </template>
-      </footer>
     </section>
   </template>
 
