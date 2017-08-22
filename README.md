@@ -22,13 +22,13 @@ $ polymer build
 This will create builds of your application in the `build/` directory, optimized to be served in production. You can then serve the built versions by giving `polymer serve` a folder to serve from:
 
 ```
-$ polymer serve build/default
+$ polymer serve build/es5-bundled
+
+$ polymer serve build/es6-unbundled
 ```
 
-## Running Tests
+## Generate Site
 
 ```
-$ polymer test
+$ npm run site
 ```
-
-Your application is already set up to be tested via [web-component-tester](https://github.com/Polymer/web-component-tester). Run `polymer test` to run your application's test suite locally.
